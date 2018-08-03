@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'liquid'
 
 module RSpec
   module Snapshot
@@ -19,9 +20,11 @@ module RSpec
       #   * There is a snapshot and the save_snapshots options is 'new'
       class MatchSnapShot
         include Snapshot::LoadSnapshot
-        def initialize(metadata, snapshot_name)
+        def initialize(metadata, snapshot_name, matcher_flavor = nil, additional_variables = nil)
           @metadata = metadata
           @snapshot_name = snapshot_name
+          @matcher_flavor = matcher_flavor || :standard
+          @additional_variables = additional_variables || {}
         end
 
         def matches?(actual)
@@ -29,7 +32,7 @@ module RSpec
           if File.exist?(snap_path)
             @found = true
             # load_snapshot attempts to deserialize the way that write_snapshot serializes
-            @expect = load_snapshot(snap_path)
+            @expect = load_snapshot(snap_path, @matcher_flavor, @additional_variables)
             pass = compare
             if save_config == :all && !pass
               write_snapshot(snap_path, @actual)
@@ -58,6 +61,10 @@ module RSpec
 
         private def write_snapshot(snap_path, serialized_value)
           Snapshot::Utils.write_snapshot(snap_path, serialized_value)
+          # Write a .liquid_snapshot file as well that contains the template if we are using match_liquid_snapshot
+          if @matcher_flavor == :liquid
+            Snapshot::Utils.write_snapshot(snap_path.gsub('.snapshot', '.liquid_snapshot'), serialized_value)
+          end
           true
         end
 
