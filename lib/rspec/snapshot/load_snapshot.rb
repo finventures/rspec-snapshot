@@ -13,7 +13,6 @@ module RSpec
         if matcher_flavor == :liquid
           template = Liquid::Template.parse(content)
           content = template.render(additional_variables.stringify_keys, :strict_variables => true)
-          binding.pry
         end
         content
       end
