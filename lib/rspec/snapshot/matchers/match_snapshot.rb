@@ -27,9 +27,14 @@ module RSpec
           @additional_variables = additional_variables || {}
         end
 
+        def snapshot_exists?(snap_path)
+          snap_path_rewritten = @matcher_flavor == :liquid ? snap_path.gsub('.snapshot', '.liquid_snapshot') : snap_path
+          File.exist?(snap_path_rewritten)
+        end
+
         def matches?(actual)
           @actual = actual
-          if File.exist?(snap_path)
+          if snapshot_exists?(snap_path)
             @found = true
             # load_snapshot attempts to deserialize the way that write_snapshot serializes
             @expect = load_snapshot(snap_path, @matcher_flavor, @additional_variables)
