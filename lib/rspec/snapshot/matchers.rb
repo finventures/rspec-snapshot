@@ -6,6 +6,7 @@ module RSpec
     module Matchers
       def match_snapshot(snapshot_name)
         binding.pry
+        puts self.class.metadata
         MatchSnapShot.new(self.class.metadata, snapshot_name)
       end
 
