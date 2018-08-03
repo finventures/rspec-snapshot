@@ -1,4 +1,4 @@
-require 'fileutils'
+        require 'fileutils'
 require 'oj'
 
 module RSpec
@@ -20,7 +20,7 @@ module RSpec
         if serializer
           serializer.dump(value)
         else
-          Oj.dump(value, quirks_mode: true, mode: :compat)
+          Oj.dump(value, quirks_mode: true, mode: :rails)
         end
       end
 
@@ -28,7 +28,7 @@ module RSpec
         if serializer
           serializer.load(string_value)
         else
-          Oj.load(string_value, quirks_mode: true, mode: :compat)
+          Oj.load(string_value, quirks_mode: true, mode: :rails)
         end
       rescue
         string_value
